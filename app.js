@@ -3,8 +3,8 @@ $(document).ready(function(){
 	function getPersons(data){
 		var personsList = document.createElement('ul');
 		$.each(data, function(i, person){
+			//creating DOM elements
 			var personLi = document.createElement('li');
-
 			var personP = document.createElement('p');
 			var personData = "<b>" + person.firstName + "</b>";
 			if(person.surname !== "")
@@ -14,30 +14,13 @@ $(document).ready(function(){
 			personData += ", gender: " + person.gender;
 			personP.innerHTML = personData;
 
-			var directFriendsBtn = document.createElement('button');
-			directFriendsBtn.innerHTML = "Direct Friends";
-			directFriendsBtn.addEventListener('click', displayDirectFriends(person, data));
+			var directFriendsBtn = createNewButton("Direct Friends", displayDirectFriends(person, data));
+			var friendsOfFriendsBtn = createNewButton("Friends of Friends", displayFriendsOfFriends(person, data));
+			var suggestedFriendsBtn = createNewButton("Suggested Friends", displaySuggestedFriends(person, data));
+			var directFriendsP = createNewP("directFriendsNames", person);
+			var friendsOfFriendsP = createNewP("friendsOfFriendsNames", person);
+			var suggestedFriendsP = createNewP("suggestedFriendsPNames", person);
 
-			var friendsOfFriendsBtn = document.createElement('button');
-			friendsOfFriendsBtn.innerHTML = "Friends of Friends";
-			friendsOfFriendsBtn.addEventListener('click', displayFriendsOfFriends(person, data));
-
-			var suggestedFriendsBtn = document.createElement('button');
-			suggestedFriendsBtn.innerHTML = "Suggested Friends";
-			suggestedFriendsBtn.addEventListener('click', displaySuggestedFriends(person, data));
-
-			var directFriendsP = document.createElement('p');
-			directFriendsP.setAttribute("id", "directFriendsNames" + person.id);
-			directFriendsP.addEventListener("click", function(){this.innerHTML="";});
-
-			var friendsOfFriendsP = document.createElement('p');
-			friendsOfFriendsP.setAttribute("id", "friendsOfFriendsNames" + person.id);
-			friendsOfFriendsP.addEventListener("click", function(){this.innerHTML="";});
-
-			var suggestedFriendsP = document.createElement('p');
-			suggestedFriendsP.setAttribute("id", "suggestedFriendsPNames" + person.id);
-			suggestedFriendsP.addEventListener("click", function(){this.innerHTML="";});
-			
 			personLi.appendChild(personP);
 			personLi.appendChild(directFriendsBtn);
 			personLi.appendChild(directFriendsP);
@@ -49,6 +32,21 @@ $(document).ready(function(){
 		});
 
 		document.querySelector(".persons").appendChild(personsList);
+
+		function createNewButton(text, callback){
+			var element = document.createElement('button');
+			element.innerHTML = text;
+			element.addEventListener('click', callback);
+			return element;
+		};
+
+		function createNewP(idText, person){
+			var element = document.createElement('p');
+			element.setAttribute("id", idText + person.id);
+			element.addEventListener("click", function(){this.innerHTML="";});
+			return element;
+
+		};
 
 		function displayDirectFriends(person, data){
 			return function(){
@@ -90,12 +88,11 @@ $(document).ready(function(){
 			}					
 		};
 
-		const flatten = arr => arr.reduce(
-		  (acc, val) => acc.concat(
-		    Array.isArray(val) ? flatten(val) : val
-		  ),
-		  []
-		);
+		function flatten(arr) {
+  			return arr.reduce(function (flat, toFlatten) {
+    			return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
+  			}, []);
+		}
 
 		function displaySuggestedFriends(person, data){
 			return function(){
@@ -178,5 +175,3 @@ $(document).ready(function(){
 
 	$.getJSON("data.json", getPersons);
 });
-
-
